@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - curl -o packer.zip https://releases.hashicorp.com/packer/1.8.5/packer_1.8.5_linux_amd64.zip
+      - unzip packer.zip
+      - sudo mv packer /usr/local/bin/
+  pre_build:
+    commands:
+      - git clone https://github.com/mohsin1280/Base-AMI.git packer-config  # Replace <your-git-repo-url> with your actual Git repository URL
+      - cd packer-config
+  build:
+    commands:
+      - packer build pkr.hcl
+artifacts:
+  files:
+    - '*'
+
