@@ -15,6 +15,7 @@ source "amazon-ebs" "amazon-linux" {
   ami_name        = "ami-version-1.0.1-{{timestamp}}"
   instance_type   = "t2.micro"
   region          = "ap-southeast-2"
+  ssh_username    = "ec2-user"
   source_ami_filter {
     filters = {
       name                = "amzn2-ami-hvm-2.0.????????.?-x86_64-gp2"
