@@ -19,3 +19,6 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a 
 curl -O https://inspector-agent.amazonaws.com/linux/latest/install
 sudo bash install
 
+# install Docker
+sudo yum -y install docker
+sudo systemctl start docker
