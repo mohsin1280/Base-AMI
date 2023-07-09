@@ -1,6 +1,7 @@
-# If you have your default VPC available, you can specify it here.
+# If you have your default VPC available then use it. 
 
-# Required plugins for Amazon EC2
+# packer puglin for AWS 
+# https://www.packer.io/plugins/builders/amazon 
 packer {
   required_plugins {
     amazon = {
@@ -10,38 +11,48 @@ packer {
   }
 }
 
-# Define the source AMI, instance type, region, and other configuration options
+# which ami to use as the base and where to save it
 source "amazon-ebs" "amazon-linux" {
+  region          = "ap-southeast-2"
   ami_name        = "ami-version-1.0.1-{{timestamp}}"
   instance_type   = "t2.micro"
-  region          = "ap-southeast-2"
+  source_ami      = "ami-0d6294dcaac5546e4"
   ssh_username    = "ec2-user"
-  source_ami_filter {
-    filters = {
-      name                = "amzn2-ami-hvm-2.0.????????.?-x86_64-gp2"
-      root-device-type    = "ebs"
-      virtualization-type = "hvm"
-    }
-    most_recent = true
-    owners      = ["amazon"]
-  }
+  #ami_users       = ["AWS Account ID"]
+  ami_regions     = [
+                      "ap-southeast-2"
+                    ]
 }
 
-# Define the build process and provisioners
+# what to install, configure and file to copy/execute
 build {
-  name    = "hq-packer"
-  sources = ["source.amazon-ebs.amazon-linux"]
+  name = "hq-packer"
+  sources = [
+    "source.amazon-ebs.amazon-linux"
+  ]
 
   provisioner "file" {
-    source      = "provisioner.sh"
-    destination = "/tmp/provisioner.sh"
+  source = "provisioner.sh"
+  destination = "/tmp/provisioner.sh"
+}
+
+  provisioner "shell" {
+    inline = ["chmod a+x /tmp/provisioner.sh"]
+  }
+  
+  provisioner "shell" {
+    inline = [ "ls -la /tmp"]
+  }
+  
+    provisioner "shell" {
+    inline = [ "pwd"]
+  }
+  
+  provisioner "shell" {
+    inline = [ "cat /tmp/provisioner.sh"]
   }
 
   provisioner "shell" {
-    inline = [
-      "chmod +x /tmp/provisioner.sh",
-      "/tmp/provisioner.sh"
-    ]
+    inline = ["/bin/bash -x /tmp/provisioner.sh"]
   }
 }
-
