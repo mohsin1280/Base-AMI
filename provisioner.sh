@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 
 # update package
-sudo yum -y update
+sudo apt update
+sudo apt upgrade -y
 
 # install git
-sudo yum install -y git
+sudo apt install -y git
 
 # install SSM
-sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-#sudo systemctl start amazon-ssm-agent
+curl "https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb" -o "amazon-ssm-agent.deb"
+sudo dpkg -i amazon-ssm-agent.deb
 
 # install CloudWatch Agent
-sudo yum install -y https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a start
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -m ec2 -a status
+curl "https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb" -o "amazon-cloudwatch-agent.deb"
+sudo dpkg -i amazon-cloudwatch-agent.deb
 
 # install AWS Inspector
 curl -O https://inspector-agent.amazonaws.com/linux/latest/install
 sudo bash install
 
 # install Docker
-sudo yum -y install docker
+sudo apt install -y docker.io
 sudo systemctl start docker
