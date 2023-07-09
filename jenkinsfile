@@ -1,34 +1,40 @@
 pipeline {
     agent any
+    environment {
+                AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
+                AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
+                SONAR_TOKEN = credentials('sonarcloud-credentials')
+                DOCKER_LOGIN_JFROG = credentials('JF_ACCESS_TOKEN')
+                DOCKER_IMAGE_NAME = "stacknexus.jfrog.io/docker-local/hello-frog:1.0.0"
+            }
     stages {
-        stage("AWS Demo") {
+        stage ('Packer init') {
             steps {
-                withCredentials([
-                    [
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-credential',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                    ]
-                ]) {
-                    sh "aws s3 ls"
-                }
-            }
+                    echo 'initializing packer'
+                    sh '/usr/bin/packer init aws-ami.pkr.hcl'
+            }  
         }
-        stage("Building AMI") {
+        stage ('Packer fmt') {
             steps {
-                withCredentials([
-                    [
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-credential',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                    ]
-                ]) {
-                    sh "packer init aws-ami-v1.pkr.hcl"
-                    sh "packer build aws-ami-v1.pkr.hcl"
+                script {
+                    echo 'formatting packer code'
+                    sh '/usr/bin/packer fmt aws-ami.pkr.hcl'
                 }
-            }
+            }  
+        }
+        stage ('Packer validate') {
+            steps {
+                script {
+                    echo 'validating packer code'
+                    sh '/usr/bin/packer validate aws-ami.pkr.hcl'
+                }
+            }  
+        }
+        stage ('packer build ami') {
+            steps {
+                    echo 'building ami'
+                    sh '/usr/bin/packer build aws-ami.pkr.hcl'
+            }  
         }
     }
 }
