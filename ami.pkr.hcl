@@ -5,54 +5,45 @@
 packer {
   required_plugins {
     amazon = {
-      version = ">= 0.0.2"
+      version = ">= 1.2.6"
       source  = "github.com/hashicorp/amazon"
     }
   }
 }
 
-# which ami to use as the base and where to save it
+# source block has 2 labels 
+# amazon-ebs - is the builder type
+# amazon-linux - is the name assigned to this builder
+# properties that can be assigned - https://developer.hashicorp.com/packer/plugins/builders/amazon/instance#run-configuration
 source "amazon-ebs" "amazon-linux" {
-  region          = "ap-southeast-2"
-  ami_name        = "ami-version-1.0.1-{{timestamp}}"
-  instance_type   = "t2.micro"
-  source_ami      = "ami-0d6294dcaac5546e4"
-  ssh_username    = "ec2-user"
-  #ami_users       = ["733421780385"]
-  ami_regions     = [
-                      "ap-southeast-2"
-                    ]
+  region        = "ap-southeast-2"
+  ami_name      = "ami-version-1.0.1-{{timestamp}}"
+  instance_type = "t2.micro"
+  # source_ami    = "ami-06cd706b6bacee637" - Does not work with Amazon Linux 2023 versions of AMIs (inspector-agent from the provisioner.sh)
+  source_ami    = "ami-0d6294dcaac5546e4"
+  ssh_username  = "ec2-user"
+  ami_regions = [
+    "ap-southeast-2"
+  ]
 }
 
 # what to install, configure and file to copy/execute
 build {
-  name = "hq-packer"
+  name = "devops-learning-packer"
   sources = [
     "source.amazon-ebs.amazon-linux"
   ]
 
   provisioner "file" {
-  source = "provisioner.sh"
-  destination = "/tmp/provisioner.sh"
-}
+    source      = "Part1/provisioner.sh"
+    destination = "/tmp/provisioner.sh"
+  }
 
   provisioner "shell" {
     inline = ["chmod a+x /tmp/provisioner.sh"]
   }
-  
-  provisioner "shell" {
-    inline = [ "ls -la /tmp"]
-  }
-  
-    provisioner "shell" {
-    inline = [ "pwd"]
-  }
-  
-  provisioner "shell" {
-    inline = [ "cat /tmp/provisioner.sh"]
-  }
 
   provisioner "shell" {
-    inline = ["/bin/bash -x /tmp/provisioner.sh"]
+    inline = ["/tmp/provisioner.sh"]
   }
 }
