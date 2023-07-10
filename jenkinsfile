@@ -1,5 +1,10 @@
 pipeline {
-    agent { label 'my-agent' }
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('aws-credentials')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials')
+    }
 
     stages {
         stage('Packer Init') {
@@ -25,8 +30,7 @@ pipeline {
 
         stage('Packer Build AMI') {
             steps {
-                withCredentials([string(credentialsId: 'aws_access_key_id', variable: 'AWS_ACCESS_KEY_ID'),
-                                 string(credentialsId: 'aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([string(credentialsId: 'aws-credentials', variable: 'AWS_CREDENTIALS')]) {
                     echo 'Building AMI'
                     sh '/usr/bin/packer build aws-ami.pkr.hcl'
                 }
