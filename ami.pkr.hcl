@@ -35,7 +35,7 @@ build {
   ]
 
   provisioner "file" {
-    source      = "Part1/provisioner.sh"
+    source      = "provisioner.sh"
     destination = "/tmp/provisioner.sh"
   }
 
