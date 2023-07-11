@@ -1,9 +1,11 @@
 pipeline {
     agent any
+
     environment {
-        AWS_ACCESSOBJ = credentials('AWS_ACCESS_KEY')
-        AWS_SECRETOBJ = credentials('AWS_SECRET_KEY')
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_KEY')
     }
+
     stages {
         stage('Packer Init') {
             steps {
@@ -11,26 +13,25 @@ pipeline {
                 sh 'packer init aws-ami.pkr.hcl'
             }
         }
+
         stage('Packer Fmt') {
             steps {
                 echo 'Formatting Packer code'
                 sh 'packer fmt aws-ami.pkr.hcl'
             }
         }
+
         stage('Packer Validate') {
             steps {
                 echo 'Validating Packer code'
                 sh 'packer validate aws-ami.pkr.hcl'
             }
         }
+
         stage('Packer Build AMI') {
             steps {
-                script {
-                    env.AWS_ACCESS_KEY = "${AWS_ACCESSOBJ_PSW}"
-                    env.AWS_SECRET_KEY = "${AWS_SECRETOBJ_PSW}"
-                    echo 'Building AMI'
-                    sh 'packer build aws-ami.pkr.hcl'
-                }
+                echo 'Building AMI'
+                sh 'packer build aws-ami.pkr.hcl'
             }
         }
     }
