@@ -10,28 +10,28 @@ pipeline {
         stage('Packer Init') {
             steps {
                 echo 'Initializing Packer'
-                sh 'packer init aws-ami.pkr.hcl'
+                sh 'packer init ami.pkr.hcl'
             }
         }
 
         stage('Packer Fmt') {
             steps {
                 echo 'Formatting Packer code'
-                sh 'packer fmt aws-ami.pkr.hcl'
+                sh 'packer fmt ami.pkr.hcl'
             }
         }
 
         stage('Packer Validate') {
             steps {
                 echo 'Validating Packer code'
-                sh 'packer validate aws-ami.pkr.hcl'
+                sh 'packer validate ami.pkr.hcl'
             }
         }
 
         stage('Packer Build AMI') {
             steps {
                 echo 'Building AMI'
-                sh 'packer build aws-ami.pkr.hcl'
+                sh 'packer build ami.pkr.hcl'
             }
         }
     }
